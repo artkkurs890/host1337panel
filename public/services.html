@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>13377777.xyz | My Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0c; --card: #121217; --sidebar: #0f0f13;
+            --accent: #7b2cbf; --text: #eee; --dim: #888;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar); height: 100vh; border-right: 1px solid #23232a; padding: 20px; position: fixed; }
+        .sidebar h2 { color: var(--accent); font-size: 20px; margin-bottom: 30px; }
+        .nav-item { padding: 12px; color: var(--dim); text-decoration: none; display: block; border-radius: 5px; margin-bottom: 5px; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: #1a1a22; color: #fff; }
+        .nav-item i { margin-right: 10px; width: 20px; }
+
+        /* Main Content */
+        .main { flex-grow: 1; display: flex; flex-direction: column; margin-left: 260px; min-height: 100vh; }
+        header { padding: 15px 30px; border-bottom: 1px solid #23232a; display: flex; justify-content: flex-end; align-items: center; background: var(--sidebar); }
+        .header-icons { display: flex; align-items: center; gap: 20px; }
+        .terminal-trigger { color: var(--accent); font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .terminal-trigger:hover { color: #fff; transform: scale(1.1); }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent); }
+
+        .content { padding: 40px; }
+        h1 { margin-bottom: 30px; font-size: 24px; }
+
+        .service-card { 
+            background: var(--card); 
+            border: 1px solid #23232a; 
+            padding: 25px; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            text-decoration: none; 
+            color: inherit; 
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .service-card:hover { border-color: var(--accent); background: #16161d; }
+        
+        .service-info h3 { margin: 0 0 5px 0; font-size: 18px; }
+        .service-info p { margin: 0; color: var(--dim); font-size: 13px; }
+
+        .status-tag { display: flex; align-items: center; gap: 8px; }
+        .status-online { color: #4caf50; font-weight: bold; font-size: 14px; }
+        
+        .price-tag { text-align: right; margin-right: 30px; }
+        .price-label { font-size: 10px; color: var(--dim); text-transform: uppercase; }
+        .price-value { font-weight: bold; color: #fff; }
+
+        .empty-slot {
+            border: 2px dashed #23232a;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: var(--dim);
+            transition: 0.3s;
+        }
+        .empty-slot:hover { border-color: var(--accent); color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>13377777.xyz</h2>
+    <a href="/dashboard.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+    <a href="/services.html" class="nav-item active"><i class="fas fa-server"></i> My Services</a>
+    <a href="/billing.html" class="nav-item"><i class="fas fa-wallet"></i> Billing</a>
+</div>
+
+<div class="main">
+    <header>
+        <div class="header-icons">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+        </div>
+    </header>
+
+    <div class="content">
+        <h1>My Services</h1>
+
+        <a href="/server-manage.html" class="service-card">
+            <div class="service-info">
+                <h3>butflopsmp</h3>
+                <p>Node: Allay (Node 134899) - Poland</p>
+            </div>
+            
+            <div style="display: flex; align-items: center;">
+                <div class="price-tag">
+                    <div class="price-label">Monthly</div>
+                    <div class="price-value">$3.29</div>
+                </div>
+                <div class="status-tag">
+                    <span class="status-online">● Active</span>
+                </div>
+                <i class="fas fa-chevron-right" style="margin-left: 25px; color: #333;"></i>
+            </div>
+        </a>
+
+        <a href="https://13377777.xyz/"><div class="empty-slot">
+            <i class="fas fa-plus-circle" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+            <span>No other active services found. Click to browse catalog.</span>
+        </div></a>
+    </div>
+</div>
+
+<div id="terminal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; padding:40px; box-sizing:border-box; font-family:'Courier New', monospace; color:#4caf50;">
+    <div id="terminal-header" style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #222; padding-bottom:10px;">
+        <span style="color:#f44336; font-weight:bold;">[!] RESTRICTED ROOT ACCESS</span>
+        <span onclick="closeTerminal()" style="cursor:pointer; color:#fff;">[ESC to Exit]</span>
+    </div>
+    <div id="terminal-output" style="height:75vh; overflow-y:auto; white-space:pre-wrap; font-size:15px; line-height:1.4;">
+[SYSTEM] Initializing bypass...
+[SYSTEM] Target: Node Allay-134899
+[SYSTEM] Encryption: AES-256-GCM (Intercepted)
+[!] WARNING: Unidentified signature detected in process "butflopsmp"
+    </div>
+    <div style="display:flex; align-items:center; margin-top:20px;">
+        <span style="color:#7b2cbf; margin-right:10px; font-weight:bold;">root@13377777:~$</span>
+        <input type="text" id="terminal-input" autofocus style="background:transparent; border:none; color:#4caf50; font-family:inherit; font-size:16px; outline:none; width:100%;">
+    </div>
+</div>
+
+</body>
+</html>

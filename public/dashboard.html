@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>13377777.xyz | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0c; --card: #121217; --sidebar: #0f0f13;
+            --accent: #7b2cbf; --text: #eee; --dim: #888;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar); height: 100vh; border-right: 1px solid #23232a; padding: 20px; position: fixed; }
+        .sidebar h2 { color: var(--accent); font-size: 20px; margin-bottom: 30px; }
+        .nav-item { padding: 12px; color: var(--dim); text-decoration: none; display: block; border-radius: 5px; margin-bottom: 5px; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: #1a1a22; color: #fff; }
+        .nav-item i { margin-right: 10px; width: 20px; }
+
+        /* Main Content */
+        .main { flex-grow: 1; display: flex; flex-direction: column; margin-left: 260px; min-height: 100vh; }
+        header { padding: 15px 30px; border-bottom: 1px solid #23232a; display: flex; justify-content: flex-end; align-items: center; background: var(--sidebar); }
+        .header-icons { display: flex; align-items: center; gap: 20px; }
+        .terminal-trigger { color: var(--accent); font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .terminal-trigger:hover { color: #fff; transform: scale(1.1); }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent); }
+
+        .content { padding: 40px; }
+        .server-card { background: var(--card); border: 1px solid #23232a; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; transition: 0.3s; }
+        .server-card:hover { border-color: var(--accent); }
+        .status-online { color: #4caf50; font-weight: bold; }
+
+        /* Анимация пульсации для ошибок в терминале */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>13377777.xyz</h2>
+    <a href="/dashboard.html" class="nav-item active"><i class="fas fa-home"></i> Home</a>
+    <a href="/services.html" class="nav-item"><i class="fas fa-server"></i> My Services</a>
+    <a href="/billing.html" class="nav-item"><i class="fas fa-wallet"></i> Billing</a>
+</div>
+
+<div class="main">
+    <header>
+        <div class="header-icons">
+            <i class="fas fa-terminal terminal-trigger" title="Root Console" onclick="openSecretTerminal()"></i>
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <p>floplusta</p>
+        </div>
+    </header>
+
+    <div class="content">
+        <h1>Active Services</h1>
+        <a href="/server-manage.html" class="server-card">
+            <div>
+                <div style="font-size: 18px; font-weight: bold;">butflopsmp</div>
+                <div style="color: var(--dim); font-size: 13px;">Node: Allay | IP: allay134899.13377777.xyz</div>
+            </div>
+            <div class="status-online">● Online</div>
+        </a>
+    </div>
+</div>
+
+<div id="terminal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; padding:40px; box-sizing:border-box; font-family:'Courier New', monospace; color:#4caf50;">
+    <div id="terminal-header" style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #222; padding-bottom:10px;">
+        <span style="color:#f44336; font-weight:bold;">[!] RESTRICTED ROOT ACCESS</span>
+        <span onclick="closeTerminal()" style="cursor:pointer; color:#fff;">[ESC to Exit]</span>
+    </div>
+    <div id="terminal-output" style="height:75vh; overflow-y:auto; white-space:pre-wrap; font-size:15px; line-height:1.4;">
+[SYSTEM] Initializing bypass...
+[SYSTEM] Target: Node Allay-134899
+[SYSTEM] Encryption: AES-256-GCM (Intercepted)
+[!] WARNING: Unidentified signature detected in process "butflopsmp"
+    </div>
+    <div style="display:flex; align-items:center; margin-top:20px;">
+        <span style="color:#7b2cbf; margin-right:10px; font-weight:bold;">root@13377777:~$</span>
+        <input type="text" id="terminal-input" autofocus style="background:transparent; border:none; color:#4caf50; font-family:inherit; font-size:16px; outline:none; width:100%;">
+    </div>
+</div>
+
+<script>
+    const termOverlay = document.getElementById('terminal-overlay');
+    const termInput = document.getElementById('terminal-input');
+    const termOutput = document.getElementById('terminal-output');
+
+    function openSecretTerminal() {
+        const key = prompt("CRITICAL ACCESS: Enter Override Key");
+        
+        // Пароль из 11 серии и твоего сценария [cite: 16, 23]
+        if (key === "root_flop") { 
+            termOverlay.style.display = 'block';
+            termInput.focus();
+            printToTerm("\n[SUCCESS] Authentication accepted.\nWelcome back, floplusta.\nType 'help' for commands.");
+        } else if (key !== null) {
+            alert("ACCESS DENIED. Secure logs updated.");
+        }
+    }
+
+    function closeTerminal() {
+        termOverlay.style.display = 'none';
+    }
+
+    termInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const fullCmd = this.value.trim();
+            const cmd = fullCmd.toLowerCase();
+            printToTerm(`\n<span style="color:#7b2cbf">root@13377777:~$</span> ${fullCmd}`);
+            
+            const commands = {
+                'help': 'Available commands: ls, cat, status, scan, force_stop, whoami, emergency_purge, exit',
+                'ls': 'drwxr-xr-x  2 root root  4096 Apr 20 18:42 .core\n-rw-r--r--  1 root root  1024 Apr 20 18:42 evidence.log\n-rwx------  1 root root  2048 Apr 20 18:42 .root_secret',
+                'status': 'Node Allay: 100% Load\nWorld State: CRITICAL\nAnomalies: Detected\nEntity_ID: "NULL"',
+                'whoami': 'User: floplusta\nPermission: Level 4 (System Override)\nStatus: UNDER_OBSERVATION',
+                'cat evidence.log': '[18:42] Entity "Leo" was not supposed to find the Seed.\n[18:45] System failed to wipe memory.\n[18:50] WARNING: THEY ARE WATCHING.',
+                'exit': 'Closing session...',
+                
+                // Команда из 12 серии ARG 
+                'force_stop': '<span style="color:#f44336; animation:pulse 1s infinite; font-weight:bold;">[CRITICAL] SYSTEM_OVERRIDE: Access Denied. Integrity check failed.</span>',
+                
+                // Команды из Разбора (Часть 2) 
+                'scan --entities': '<span style="color:#3a86ff">[SCANNING...]</span>\n5 Soul_Fragments detected.\nStatus: <span style="color:#ff9800">Archived</span>\nLocation: Sector_7_Base',
+                
+                // Финальная команда освобождения 
+                'emergency_purge': '<span style="color:#fff; background:#b71c1c; padding:2px 5px;">[!!!] WARNING: INITIALIZING PROTOCOL "CLEAN_SLATE"</span>\n[SYSTEM] Attempting to release Soul_Fragments...\n[SYSTEM] Overriding host constraints...\n<span style="color:#4caf50">[SUCCESS] Entities purged. Server state: EMPTY.</span>'
+            };
+
+            if (cmd === 'exit') {
+                setTimeout(closeTerminal, 500);
+            } else if (cmd === 'cat .root_secret') {
+                printToTerm('<span style="color:#f44336">Data encrypted by Leo. Hash: 0xDEADBEEF</span>');
+            } else {
+                const response = commands[cmd] || `Command not found: ${cmd}`;
+                setTimeout(() => {
+                    printToTerm(response);
+                }, 200);
+            }
+            this.value = '';
+        }
+    });
+
+    function printToTerm(text) {
+        termOutput.innerHTML += `\n${text}`;
+        termOutput.scrollTop = termOutput.scrollHeight;
+    }
+
+    window.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeTerminal();
+    });
+</script>
+
+</body>
+</html>

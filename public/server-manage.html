@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Managing butflopsmp | 13377777.xyz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #0a0a0c; --card: #121217; --sidebar: #0f0f13; 
+            --accent: #7b2cbf; --text: #eee; --dim: #888; --green: #4caf50; --border: #23232a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 20px; flex-shrink: 0; overflow-y: auto; }
+        .nav-label { color: var(--accent); font-size: 11px; font-weight: 800; text-transform: uppercase; margin: 20px 0 10px; letter-spacing: 1px; }
+        .nav-item { padding: 12px; color: var(--dim); text-decoration: none; display: flex; align-items: center; border-radius: 6px; margin-bottom: 4px; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .nav-item i { width: 20px; margin-right: 12px; font-size: 16px; }
+        .nav-item:hover { background: #1a1a22; color: #fff; }
+        .nav-item.active { background: var(--accent); color: #fff; }
+
+        /* Main Content */
+        .main-container { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .top-bar { padding: 20px 40px; background: var(--sidebar); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .controls { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; }
+        .btn-start { background: var(--green); }
+        .btn-restart { background: #ff9800; }
+        .btn-stop { background: #f44336; }
+        .btn-kill { background: #b71c1c; }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        .view-content { padding: 30px 40px; display: none; }
+        .view-content.active { display: block; }
+
+        /* Stats Bar */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .stat-label { color: var(--dim); font-size: 11px; text-transform: uppercase; font-weight: 700; }
+        .stat-value { font-size: 18px; font-weight: 800; margin-top: 5px; color: var(--text); }
+
+        /* Terminal */
+        .terminal { background: #000; border-radius: 8px; padding: 20px; font-family: 'Fira Code', monospace; height: 350px; overflow-y: auto; border: 1px solid #1a1a22; color: #ccc; font-size: 13px; margin-bottom: 10px; box-shadow: inset 0 0 15px rgba(0,0,0,0.7); }
+        .term-ts { color: var(--dim); margin-right: 10px; }
+        .term-info { color: #3a86ff; }
+        .term-success { color: var(--green); }
+        .term-input-line { display: flex; align-items: center; background: #000; padding: 10px; border-radius: 5px; border: 1px solid #1a1a22; }
+        .term-input-line span { margin-right: 10px; color: var(--accent); font-family: 'Fira Code', monospace; font-size: 13px; }
+        .term-input { background: transparent; border: none; color: #fff; outline: none; font-family: inherit; width: 100%; font-size: 13px; }
+
+        /* Tables & Lists */
+        .info-list { list-style: none; padding: 0; background: var(--card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+        .info-item { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .info-item:hover { background: #181820; }
+        .info-item:last-child { border-bottom: none; }
+        .info-item i { margin-right: 10px; color: var(--dim); }
+
+        /* Modal Editor */
+        #file-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; }
+        .modal-box { background:var(--card); width:850px; height:80vh; border:1px solid var(--border); border-radius:10px; display:flex; flex-direction:column; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .modal-header { padding:15px 25px; background:var(--sidebar); display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+        #file-content { flex-grow:1; background:#050507; color:#ddd; border:none; padding:20px; font-family:'Fira Code', monospace; font-size:13px; resize:none; outline:none; line-height:1.5; }
+
+        /* Config Grid */
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 8px; text-transform: uppercase; }
+        .form-input { width: 100%; background: #0a0a0c; border: 1px solid var(--border); padding: 10px; color: #fff; border-radius: 4px; outline: none; }
+
+        /* Info Panel */
+        .info-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .sidebar h2 { color: var(--accent); font-size: 20px; margin-bottom: 30px; }
+        .badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; background: var(--accent); margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>13377777.xyz</h2>
+    <a href="/dashboard.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+    <a href="/services.html" class="nav-item"><i class="fas fa-server"></i> My Services</a>
+    <a href="/billing.html" class="nav-item"><i class="fas fa-wallet"></i> Billing</a>
+    
+    <div class="nav-label">Server Management</div>
+    <div class="nav-item active" onclick="showTab('console', this)"><i class="fas fa-terminal"></i> Console</div>
+    <div class="nav-item" onclick="showTab('players', this)"><i class="fas fa-users"></i> Players</div>
+    <div class="nav-item" onclick="showTab('files', this)"><i class="fas fa-folder-open"></i> File Manager</div>
+    <div class="nav-item" onclick="showTab('config', this)"><i class="fas fa-cog"></i> Config</div>
+    <div class="nav-item" onclick="showTab('database', this)"><i class="fas fa-database"></i> Databases <span class="badge" id="db-count">0/10</span></div>
+    
+    <div class="nav-label">Advanced</div>
+    <div class="nav-item" onclick="showTab('backups', this)"><i class="fas fa-archive"></i> Backups <span class="badge" id="bk-count">1/5</span></div>
+    <div class="nav-item" onclick="showTab('network', this)"><i class="fas fa-network-wired"></i> Network / Ports <span class="badge" id="port-count">1/10</span></div>
+    <div class="nav-item" onclick="showTab('domains', this)"><i class="fas fa-globe"></i> Domains</div>
+    <div class="nav-item" onclick="showTab('firewall', this)"><i class="fas fa-shield-alt"></i> Firewall</div>
+    <div class="nav-item" onclick="showTab('logs', this)"><i class="fas fa-history"></i> Activity Logs</div>
+</div>
+
+<div class="main-container">
+    <div class="top-bar">
+        <div style="font-weight: 800; font-size: 18px;">butflopsmp <span style="font-size: 12px; color: var(--dim); margin-left: 15px; font-weight: 400;">Node: Allay-134899</span></div>
+        <div class="controls">
+            <button class="btn btn-start" onclick="powerAction('START')">Start</button>
+            <button class="btn btn-restart" onclick="powerAction('RESTART')">Restart</button>
+            <button class="btn btn-stop" onclick="powerAction('STOP')">Stop</button>
+            <button class="btn btn-kill" onclick="powerAction('KILL')">Kill</button>
+        </div>
+    </div>
+
+    <div id="console" class="view-content active">
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-label">CPU Load</div><div class="stat-value" id="cpu-val">12.4%</div></div>
+            <div class="stat-box"><div class="stat-label">RAM Usage</div><div class="stat-value" id="ram-val">2.8 GB</div></div>
+            <div class="stat-box"><div class="stat-label">Disk (NVMe)</div><div class="stat-value">4.8 / 60 GB</div></div>
+            <div class="stat-box"><div class="stat-label">Network</div><div class="stat-value" id="net-val">142 KB/s</div></div>
+        </div>
+
+        <div class="terminal" id="term-body">
+            <div><span class="term-ts">[18:42:01]</span> <span class="term-info">[Internal]</span> Connecting to Allay Node...</div>
+            <div><span class="term-ts">[18:42:02]</span> <span class="term-success">[System]</span> Container Handshake Successful.</div>
+        </div>
+        <div class="term-input-line">
+            <span>container@13377777:~$</span>
+            <input type="text" class="term-input" placeholder="Type command..." id="term-cli">
+        </div>
+
+        <div class="info-panel">
+            <ul class="info-list">
+                <li class="info-item"><span>Host:Port</span> <span style="color:#fff">allay134899.13377777.xyz:25565</span></li>
+                <li class="info-item"><span>IP:Port</span> <span style="color:#fff">149.154.67.21:25565</span></li>
+                <li class="info-item"><span>Location</span> <span style="color:#fff">Poland, Warsaw</span></li>
+            </ul>
+            <ul class="info-list">
+                <li class="info-item"><span>Uptime</span> <span style="color:#fff" id="uptime-clock">14d 02h 44m</span></li>
+                <li class="info-item"><span>SupportID</span> <span style="color:#fff">134899</span></li>
+                <li class="info-item"><span>Players</span> <span style="color:#fff">5 / 50</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="files" class="view-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>File Manager</h2>
+            <small style="color:var(--dim)">/home/container</small>
+        </div>
+        <div class="info-list">
+            <div class="info-item"><span><i class="fas fa-folder"></i> world</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> world_nether</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> world_the_end</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> plugins</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> logs</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> config</span><span>--</span></div>
+            <div class="info-item"><span><i class="fas fa-folder"></i> libraries</span><span>--</span></div>
+            <div class="info-item" style="cursor:pointer;" onclick="openFile('server.properties')">
+                <span><i class="fas fa-file-code" style="color:var(--accent)"></i> server.properties</span><span>4.1 KB</span>
+            </div>
+            <div class="info-item" style="cursor:pointer;" onclick="openFile('spigot.yml')">
+                <span><i class="fas fa-file-code"></i> spigot.yml</span><span>12.4 KB</span>
+            </div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> bukkit.yml</span><span>2.1 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> paper.yml</span><span>8.5 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> commands.yml</span><span>1.2 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> permissions.yml</span><span>0.5 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> ops.json</span><span>0.1 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> whitelist.json</span><span>0.2 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> banned-ips.json</span><span>0.1 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> banned-players.json</span><span>0.1 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> usercache.json</span><span>15.2 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-code"></i> eula.txt</span><span>0.1 KB</span></div>
+            <div class="info-item"><span><i class="fas fa-file-archive" style="color:#ff9800"></i> backup_last.tar.gz</span><span>142 MB</span></div>
+            <div class="info-item" style="color:#f44336;"><span><i class="fas fa-file-excel"></i> CRASH_LOG_UNREADABLE.tmp</span><span>0 KB</span></div>
+        </div>
+    </div>
+
+    <div id="config" class="view-content">
+        <h2 style="margin-bottom:20px;">Configuration</h2>
+        <div class="info-list" style="padding:25px;">
+            <div class="config-grid">
+                <div class="form-group"><label>Difficulty</label><select class="form-input"><option>Easy</option><option selected>Normal</option><option>Hard</option><option>Peaceful</option></select></div>
+                <div class="form-group"><label>Gamemode</label><select class="form-input"><option selected>Survival</option><option>Creative</option><option>Adventure</option></select></div>
+                <div class="form-group"><label>Max Players</label><input type="number" class="form-input" value="50"></div>
+                <div class="form-group"><label>Level Name</label><input type="text" class="form-input" value="world"></div>
+                <div class="form-group"><label>PVP</label><select class="form-input"><option selected>Enabled</option><option>Disabled</option></select></div>
+                <div class="form-group"><label>Online Mode</label><select class="form-input"><option>True</option><option selected>False</option></select></div>
+            </div>
+            <button class="btn btn-start" style="margin-top:20px;">Save Settings</button>
+        </div>
+    </div>
+
+    <div id="network" class="view-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>Network / Ports</h2>
+            <button class="btn btn-start" id="add-port-btn" onclick="addPort()">Create Allocation</button>
+        </div>
+        <div class="info-list" id="port-list">
+            <div class="info-item">
+                <div><strong style="color:var(--accent)">149.154.67.21</strong><br><small style="color:var(--dim)">Primary Allocation</small></div>
+                <span>25565 <i class="fas fa-trash" style="margin-left:15px; opacity:0.2;"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="database" class="view-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>SQL Databases</h2>
+            <button class="btn btn-start" id="add-db-btn" onclick="addDatabase()">Create Database</button>
+        </div>
+        <div class="info-list" id="db-list"><div style="padding:20px; color:var(--dim)">No databases found.</div></div>
+    </div>
+
+    <div id="backups" class="view-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2>Backups</h2>
+            <button class="btn btn-start" id="add-bk-btn" onclick="addBackup()">Create Backup</button>
+        </div>
+        <div class="info-list" id="bk-list">
+            <div class="info-item"><span>backup_last.tar.gz</span><span>4 hours ago</span></div>
+        </div>
+    </div>
+
+    <div id="domains" class="view-content">
+        <h2 style="margin-bottom:20px;">Domain Management</h2>
+        <div class="info-list" style="padding:25px;">
+            <div class="form-group">
+                <label>Subdomain</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" class="form-input" placeholder="myserver" id="subdomain-input">
+                    <span style="align-self:center">.13377777.xyz</span>
+                    <button class="btn btn-start" onclick="addDomain()">Create</button>
+                </div>
+            </div>
+            <div id="domain-list" style="margin-top:20px;">
+                <div class="info-item"><span>butflopsmp.13377777.xyz</span><span style="color:var(--green)">Active</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="firewall" class="view-content"><h2>Firewall</h2><div class="info-list"><div class="info-item"><span>0.0.0.0/0</span><span style="color:var(--green)">Allowed</span></div></div></div>
+    <div id="players" class="view-content"><h2>Online Players</h2><div class="info-list"><div class="info-item">floplusta <span class="term-success">Online</span></div></div></div>
+    <div id="logs" class="view-content"><h2>Activity Logs</h2><div class="info-list"><div class="info-item"><span>User floplusta login</span><span>2026-04-20 18:40</span></div></div></div>
+
+</div>
+
+<div id="file-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span id="modal-filename">file.txt</span>
+            <button onclick="closeFile()" style="background:none; border:none; color:#fff; cursor:pointer; font-size:24px;">&times;</button>
+        </div>
+        <textarea id="file-content" spellcheck="false"></textarea>
+        <div style="padding:15px; background:var(--sidebar); text-align:right; border-top:1px solid #23232a;">
+            <button class="btn btn-start" onclick="closeFile()">Save Content</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let dbCount = 0;
+    let bkCount = 1;
+    let portCount = 1;
+
+    // Tab System
+    function showTab(tabId, el) {
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    // Power Actions Simulation
+    function powerAction(action) {
+        const termBody = document.getElementById('term-body');
+        const line = document.createElement('div');
+        line.innerHTML = `<span class="term-ts">[${new Date().toLocaleTimeString()}]</span> <span style="color:#f44336">[Daemon] Failed to send ${action} signal: Socket connection reset by peer.</span>`;
+        termBody.appendChild(line);
+        termBody.scrollTop = termBody.scrollHeight;
+    }
+
+    // Live Stats Simulation
+    function updateStats() {
+        document.getElementById('cpu-val').innerText = (Math.random() * (15 - 8) + 8).toFixed(1) + "%";
+        document.getElementById('ram-val').innerText = (Math.random() * (2.9 - 2.5) + 2.5).toFixed(1) + " GB";
+        document.getElementById('net-val').innerText = Math.floor(Math.random() * (250 - 40) + 40) + " KB/s";
+    }
+    setInterval(updateStats, 2500);
+
+    // Terminal Commands
+    const term = document.getElementById('term-body');
+    document.getElementById('term-cli').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value;
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="term-ts">[${new Date().toLocaleTimeString()}]</span> <span style="color:#fff">> ${cmd}</span>`;
+            term.appendChild(line);
+            this.value = '';
+            
+            setTimeout(() => {
+                const res = document.createElement('div');
+                res.innerHTML = `<span class="term-ts">[${new Date().toLocaleTimeString()}]</span> <span style="color:#f44336">Unknown command or permission denied.</span>`;
+                term.appendChild(res);
+                term.scrollTop = term.scrollHeight;
+            }, 600);
+        }
+    });
+
+    // DB / Backup / Port logic
+    function addDatabase() {
+        if (dbCount >= 10) return;
+        dbCount++;
+        const list = document.getElementById('db-list');
+        if (dbCount === 1) list.innerHTML = '';
+        const item = document.createElement('div');
+        item.className = 'info-item';
+        item.innerHTML = `<span>db_s134899_${dbCount}</span><span>MySQL 8.0</span>`;
+        list.appendChild(item);
+        document.getElementById('db-count').innerText = `${dbCount}/10`;
+    }
+
+    function addBackup() {
+        if (bkCount >= 5) return;
+        bkCount++;
+        const item = document.createElement('div');
+        item.className = 'info-item';
+        item.innerHTML = `<span>backup_manual_${new Date().getTime()}.tar.gz</span><span>Just now</span>`;
+        document.getElementById('bk-list').appendChild(item);
+        document.getElementById('bk-count').innerText = `${bkCount}/5`;
+    }
+
+    function addPort() {
+        if (portCount >= 10) return;
+        portCount++;
+        const list = document.getElementById('port-list');
+        const port = Math.floor(Math.random() * (29000 - 26000) + 26000);
+        const div = document.createElement('div');
+        div.className = 'info-item';
+        div.innerHTML = `<div><strong style="color:var(--accent)">149.154.67.21</strong><br><small style="color:var(--dim)">Allocated Port</small></div><span>${port} <i class="fas fa-trash" style="margin-left:15px; color:#f44336; cursor:pointer;" onclick="this.parentElement.parentElement.remove(); portCount--; document.getElementById('port-count').innerText = portCount+'/10';"></i></span>`;
+        list.appendChild(div);
+        document.getElementById('port-count').innerText = `${portCount}/10`;
+    }
+
+    function addDomain() {
+        const sub = document.getElementById('subdomain-input').value;
+        if (!sub) return;
+        const item = document.createElement('div');
+        item.className = 'info-item';
+        item.innerHTML = `<span>${sub}.13377777.xyz</span><span style="color:var(--green)">Active</span>`;
+        document.getElementById('domain-list').appendChild(item);
+        document.getElementById('subdomain-input').value = '';
+    }
+
+    // File Editor Logic
+    const serverProps = `#Minecraft server properties\n#Wed Mar 25 19:32:54 EET 2026\ndifficulty=normal\ngamemode=survival\nmax-players=50\nonline-mode=false\nserver-port=25565`;
+
+    function openFile(name) {
+        document.getElementById('modal-filename').innerText = name;
+        document.getElementById('file-content').value = (name === 'server.properties') ? serverProps : "# System file is read-only.";
+        document.getElementById('file-modal').style.display = 'flex';
+    }
+    function closeFile() { document.getElementById('file-modal').style.display = 'none'; }
+</script>
+
+</body>
+</html>
